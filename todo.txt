@@ -2,7 +2,7 @@ See http://spec.commonmark.org/0.25/ for referenced examples.
 
 Misc
 	[X] 		Normalize line endings
-	[X]			Make sure file ends in \n\n
+	[X]             Make sure file ends in \n\n
 
 ATX Headings
 	[X] (30) 	Simple heading

@@ -4,7 +4,8 @@
 //   license: you are granted a perpetual, irrevocable license to copy, modify,
 //   publish, and distribute this file as you see fit.
 
-#ifdef SV_MARKDOWN_IMPLEMENTATION
+#pragma once
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -369,5 +370,3 @@ extern char* sv_compile_ast(char* markdown)
 
 	return result;
 }
-
-#endif
