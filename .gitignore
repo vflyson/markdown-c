@@ -1,6 +1,3 @@
-/[Bb]uild
-/[Tt]est
-*.sln
-*.suo
-*.sdf
-*.opendb
+*~
+markdown_test
+
