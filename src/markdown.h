@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#define NL "\n"
+
 typedef uint32_t md_uint32;
 typedef int32_t md_int32;
 
@@ -352,30 +354,30 @@ extern char* md_compile_ast(char* markdown)
             break;
 
             case MD_TOKEN_HEADING1:
-                printf("<h1>%.*s</h1>\n", token.length, token.text); 
+                printf("<h1>%.*s</h1>"NL, token.length, token.text); 
             break;
             case MD_TOKEN_HEADING2:
-                printf("<h2>%.*s</h2>\n", token.length, token.text);
+                printf("<h2>%.*s</h2>"NL, token.length, token.text);
             break;
             case MD_TOKEN_HEADING3:
-                printf("<h3>%.*s</h3>\n", token.length, token.text);
+                printf("<h3>%.*s</h3>"NL, token.length, token.text);
             break;
             case MD_TOKEN_HEADING4:
-                printf("<h4>%.*s</h4>\n", token.length, token.text);
+                printf("<h4>%.*s</h4>"NL, token.length, token.text);
             break;
             case MD_TOKEN_HEADING5:
-                printf("<h5>%.*s</h5>\n", token.length, token.text);
+                printf("<h5>%.*s</h5>"NL, token.length, token.text);
             break;
             case MD_TOKEN_HEADING6:
-                printf("<h6>%.*s</h6>\n", token.length, token.text);
+                printf("<h6>%.*s</h6>"NL, token.length, token.text);
             break;
 
             case MD_TOKEN_THEMATIC_BREAK:
-                printf("<hr />\n");
+                printf("<hr />"NL);
             break;
 
             case MD_TOKEN_PARAGRAPH:
-                printf("<p>%.*s</p>\n", token.length, token.text);
+                printf("<p>%.*s</p>"NL, token.length, token.text);
             break;
         }
     }

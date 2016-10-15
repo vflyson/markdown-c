@@ -36,7 +36,5 @@ int main(int argc, char** argv[])
 
     printf("%s\n", headerTest);
 
-    markdown_compile_ast(headerTest);
-
-    getchar();
+    md_compile_ast(headerTest);
 }
