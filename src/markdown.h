@@ -13,36 +13,36 @@
 #include <stdio.h>
 #include <math.h>
 
-typedef uint32_t markdown_uint32;
-typedef int32_t markdown_int32;
+typedef uint32_t md_uint32;
+typedef int32_t md_int32;
 
 typedef enum
 {
-    MARKDOWN_TOKEN_TEST,
-    MARKDOWN_TOKEN_HEADING1,
-    MARKDOWN_TOKEN_HEADING2,
-    MARKDOWN_TOKEN_HEADING3,
-    MARKDOWN_TOKEN_HEADING4,
-    MARKDOWN_TOKEN_HEADING5,
-    MARKDOWN_TOKEN_HEADING6,
-    MARKDOWN_TOKEN_THEMATIC_BREAK,
-    MARKDOWN_TOKEN_PARAGRAPH,
-    MARKDOWN_TOKEN_EOF
-} markdown_token_type;
+    MD_TOKEN_TEST,
+    MD_TOKEN_HEADING1,
+    MD_TOKEN_HEADING2,
+    MD_TOKEN_HEADING3,
+    MD_TOKEN_HEADING4,
+    MD_TOKEN_HEADING5,
+    MD_TOKEN_HEADING6,
+    MD_TOKEN_THEMATIC_BREAK,
+    MD_TOKEN_PARAGRAPH,
+    MD_TOKEN_EOF
+} md_token_type;
 
-typedef struct markdown_token
+typedef struct md_token
 {
-    markdown_token_type type;
-    markdown_uint32 length;
+    md_token_type type;
+    md_uint32 length;
     char* text;
-} markdown_token;
+} md_token;
 
-typedef struct markdown_tokenizer
+typedef struct md_tokenizer
 {
     char* at;
-} markdown_tokenizer;
+} md_tokenizer;
 
-static void markdown_trim_space_begin(markdown_token* token)
+static void md_trim_space_begin(md_token* token)
 {
     if (token->length > 0)
     {
@@ -54,7 +54,7 @@ static void markdown_trim_space_begin(markdown_token* token)
     }
 }
 
-static void markdown_trim_whitespace_begin(markdown_token* token)
+static void md_trim_whitespace_begin(md_token* token)
 {
     if (token->length > 0)
     {
@@ -71,11 +71,11 @@ static void markdown_trim_whitespace_begin(markdown_token* token)
     }
 }
 
-static void markdown_trim_space_end(markdown_token* token)
+static void md_trim_space_end(md_token* token)
 {
     if (token->length > 0)
     {
-        markdown_uint32 pos = token->length - 1;
+        md_uint32 pos = token->length - 1;
 
         while (token->text[pos] == ' ')
         {
@@ -86,11 +86,11 @@ static void markdown_trim_space_end(markdown_token* token)
     }
 }
 
-static void markdown_trim_whitespace_end(markdown_token* token)
+static void md_trim_whitespace_end(md_token* token)
 {
     if (token->length > 0)
     {
-        markdown_uint32 pos = token->length - 1;
+        md_uint32 pos = token->length - 1;
 
         while (token->text[pos] == ' ' ||
             token->text[pos] == '\n' ||
@@ -106,14 +106,14 @@ static void markdown_trim_whitespace_end(markdown_token* token)
     }
 }
 
-static char* markdown_normalize_line_endings(char* text)
+static char* md_normalize_line_endings(char* text)
 {
     size_t length = strlen(text);
 
-    markdown_uint32 sourceAt = 0;
-    markdown_uint32 destAt = 0;
+    md_uint32 sourceAt = 0;
+    md_uint32 destAt = 0;
 
-    markdown_uint32 newlinesToAdd = 0;
+    md_uint32 newlinesToAdd = 0;
 
     //+2 for possibly inserting newlines at end.
     char* cleaned = malloc(length + 2);
@@ -161,9 +161,9 @@ static char* markdown_normalize_line_endings(char* text)
     return cleaned;
 }
 
-static void markdown_parse_paragraph(markdown_tokenizer* tokenizer, markdown_token* token)
+static void md_parse_paragraph(md_tokenizer* tokenizer, md_token* token)
 {
-    markdown_uint32 charCount = 1;
+    md_uint32 charCount = 1;
 
     while (tokenizer->at[charCount] != '\0')
     {
@@ -177,7 +177,7 @@ static void markdown_parse_paragraph(markdown_tokenizer* tokenizer, markdown_tok
         }
     }
 
-    token->type = MARKDOWN_TOKEN_PARAGRAPH;
+    token->type = MD_TOKEN_PARAGRAPH;
 
     token->text = malloc(charCount + 1);
     strncpy(token->text, tokenizer->at, charCount);
@@ -185,18 +185,18 @@ static void markdown_parse_paragraph(markdown_tokenizer* tokenizer, markdown_tok
 
     token->length = charCount;
 
-    markdown_trim_whitespace_end(token);
-    markdown_trim_whitespace_begin(token);
+    md_trim_whitespace_end(token);
+    md_trim_whitespace_begin(token);
 
     tokenizer->at += charCount + 2;
 }
 
-static void markdown_parse_thematic_break(markdown_tokenizer* tokenizer, markdown_token* token, const char breakCharacter)
+static void md_parse_thematic_break(md_tokenizer* tokenizer, md_token* token, const char breakCharacter)
 {
-    token->type = MARKDOWN_TOKEN_THEMATIC_BREAK;
+    token->type = MD_TOKEN_THEMATIC_BREAK;
 
-    markdown_uint32 breakTokenCount = 1;
-    markdown_uint32 charCount = 1;
+    md_uint32 breakTokenCount = 1;
+    md_uint32 charCount = 1;
 
     while (tokenizer->at[charCount] != '\0' &&
         tokenizer->at[charCount] != '\n')
@@ -212,13 +212,13 @@ static void markdown_parse_thematic_break(markdown_tokenizer* tokenizer, markdow
         }
         else
         {
-            markdown_parse_paragraph(tokenizer, token);
+            md_parse_paragraph(tokenizer, token);
         }
     }
 
     if (breakTokenCount < 3)
     {
-        markdown_parse_paragraph(tokenizer, token);
+        md_parse_paragraph(tokenizer, token);
 
     }
     else
@@ -227,10 +227,10 @@ static void markdown_parse_thematic_break(markdown_tokenizer* tokenizer, markdow
     }
 }
 
-static void markdown_parse_atx_headers(markdown_tokenizer* tokenizer, markdown_token* token)
+static void md_parse_atx_headers(md_tokenizer* tokenizer, md_token* token)
 {
-    markdown_uint32 headingCounter = 1;
-    markdown_uint32 charCount = 0;
+    md_uint32 headingCounter = 1;
+    md_uint32 charCount = 0;
 
     while (tokenizer->at[headingCounter] &&
         tokenizer->at[headingCounter] == '#')
@@ -254,30 +254,30 @@ static void markdown_parse_atx_headers(markdown_tokenizer* tokenizer, markdown_t
                 }
             }
 
-            token->type = MARKDOWN_TOKEN_HEADING1 + (headingCounter - 1);
+            token->type = MD_TOKEN_HEADING1 + (headingCounter - 1);
             token->text = &tokenizer->at[headingCounter + 1];
             //NOTE(Simon): - 1 to get rid of newline
             token->length = charCount - 1;
             //NOTE(Simon): + 1 to skip tokenizer past newline
             tokenizer->at += charCount + headingCounter + 1;
 
-            markdown_trim_space_end(token);
-            markdown_trim_space_begin(token);
+            md_trim_space_end(token);
+            md_trim_space_begin(token);
         }
         else
         {
-            markdown_parse_paragraph(tokenizer, token);
+            md_parse_paragraph(tokenizer, token);
         }
     }
     else
     {
-        markdown_parse_paragraph(tokenizer, token);
+        md_parse_paragraph(tokenizer, token);
     }
 }
 
-static markdown_token markdown_get_token(markdown_tokenizer* tokenizer)
+static md_token md_get_token(md_tokenizer* tokenizer)
 {
-    markdown_token token = {0};
+    md_token token = {0};
     token.length = 1;
     token.text = &tokenizer->at[0];
 
@@ -285,27 +285,27 @@ static markdown_token markdown_get_token(markdown_tokenizer* tokenizer)
     {
         case '\0':
         {
-            token.type = MARKDOWN_TOKEN_EOF;
+            token.type = MD_TOKEN_EOF;
             break;
         }
         case '#':
         {
-            markdown_parse_atx_headers(tokenizer, &token);
+            md_parse_atx_headers(tokenizer, &token);
             break;
         }
         case '*':
         {
-            markdown_parse_thematic_break(tokenizer, &token, '*');
+            md_parse_thematic_break(tokenizer, &token, '*');
             break;
         }
         case '-':
         {
-            markdown_parse_thematic_break(tokenizer, &token, '-');
+            md_parse_thematic_break(tokenizer, &token, '-');
             break;
         }
         case '_':
         {
-            markdown_parse_thematic_break(tokenizer, &token, '_');
+            md_parse_thematic_break(tokenizer, &token, '_');
             break;
         }
 
@@ -316,13 +316,13 @@ static markdown_token markdown_get_token(markdown_tokenizer* tokenizer)
                 tokenizer->at++;
             }
 
-            token = markdown_get_token(tokenizer);
+            token = md_get_token(tokenizer);
             break;
         }
 
         default:
         {
-            markdown_parse_paragraph(tokenizer, &token);
+            md_parse_paragraph(tokenizer, &token);
             break;
         }
     }
@@ -330,10 +330,10 @@ static markdown_token markdown_get_token(markdown_tokenizer* tokenizer)
     return token;
 }
 
-extern char* markdown_compile_ast(char* markdown)
+extern char* md_compile_ast(char* markdown)
 {
-    markdown_tokenizer tokenizer = {0};
-    char* cleaned = markdown_normalize_line_endings(markdown);
+    md_tokenizer tokenizer = {0};
+    char* cleaned = md_normalize_line_endings(markdown);
     tokenizer.at = cleaned;
 
     bool parsing = true;
@@ -342,39 +342,39 @@ extern char* markdown_compile_ast(char* markdown)
 
     while (parsing)
     {
-        markdown_token token = markdown_get_token(&tokenizer);
+        md_token token = md_get_token(&tokenizer);
 
         switch(token.type)
         {
-            case MARKDOWN_TOKEN_EOF:
+            case MD_TOKEN_EOF:
                 printf("End of file");
                 parsing = false;
             break;
 
-            case MARKDOWN_TOKEN_HEADING1:
+            case MD_TOKEN_HEADING1:
                 printf("<h1>%.*s</h1>\n", token.length, token.text); 
             break;
-            case MARKDOWN_TOKEN_HEADING2:
+            case MD_TOKEN_HEADING2:
                 printf("<h2>%.*s</h2>\n", token.length, token.text);
             break;
-            case MARKDOWN_TOKEN_HEADING3:
+            case MD_TOKEN_HEADING3:
                 printf("<h3>%.*s</h3>\n", token.length, token.text);
             break;
-            case MARKDOWN_TOKEN_HEADING4:
+            case MD_TOKEN_HEADING4:
                 printf("<h4>%.*s</h4>\n", token.length, token.text);
             break;
-            case MARKDOWN_TOKEN_HEADING5:
+            case MD_TOKEN_HEADING5:
                 printf("<h5>%.*s</h5>\n", token.length, token.text);
             break;
-            case MARKDOWN_TOKEN_HEADING6:
+            case MD_TOKEN_HEADING6:
                 printf("<h6>%.*s</h6>\n", token.length, token.text);
             break;
 
-            case MARKDOWN_TOKEN_THEMATIC_BREAK:
+            case MD_TOKEN_THEMATIC_BREAK:
                 printf("<hr />\n");
             break;
 
-            case MARKDOWN_TOKEN_PARAGRAPH:
+            case MD_TOKEN_PARAGRAPH:
                 printf("<p>%.*s</p>\n", token.length, token.text);
             break;
         }

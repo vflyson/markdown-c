@@ -30,7 +30,9 @@ int main(int argc, char** argv[])
                         "This is a multiline paragraph\n\n\n\n"
                         "This is another multiline paragraph\n"
                         "This is another multiline paragraph\n"
-                        "This is another multiline paragraph\n\n\n\n";
+                        "This is another multiline paragraph\n\n\n\n"
+                        "Paragraph with `ln -s` and `` and ```a``` and `````b```.\n"
+                        ;
 
     printf("%s\n", headerTest);
 
