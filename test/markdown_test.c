@@ -31,10 +31,12 @@ int main(int argc, char** argv[])
                         "This is another multiline paragraph\n"
                         "This is another multiline paragraph\n"
                         "This is another multiline paragraph\n\n\n\n"
-                        "Paragraph with `ln -s` and `` and ```a``` and `````b```.\n"
-                        ;
+                        "<> XML escaping <a href=\"#\">XML's not allowed in here</a>\n\n"
+                        "Text attributes _italic_, *italic*, __bold__, **bold**, `monospace`.\n\n"
+                        "A [link](http://example.com).\n"
+    ;
 
-    printf("%s\n", headerTest);
+    //printf("%s\n", headerTest);
 
     md_compile_ast(headerTest);
 }

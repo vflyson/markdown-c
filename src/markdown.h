@@ -18,29 +18,28 @@
 typedef uint32_t md_uint32;
 typedef int32_t md_int32;
 
-typedef enum
-{
-    MD_TOKEN_TEST,
+typedef enum {
     MD_TOKEN_HEADING1,
     MD_TOKEN_HEADING2,
     MD_TOKEN_HEADING3,
     MD_TOKEN_HEADING4,
     MD_TOKEN_HEADING5,
     MD_TOKEN_HEADING6,
+
     MD_TOKEN_THEMATIC_BREAK,
+
     MD_TOKEN_PARAGRAPH,
+
     MD_TOKEN_EOF
 } md_token_type;
 
-typedef struct md_token
-{
+typedef struct md_token {
     md_token_type type;
     md_uint32 length;
     char* text;
 } md_token;
 
-typedef struct md_tokenizer
-{
+typedef struct md_tokenizer {
     char* at;
 } md_tokenizer;
 
@@ -234,7 +233,7 @@ static void md_parse_atx_headers(md_tokenizer* tokenizer, md_token* token)
     md_uint32 headingCounter = 1;
     md_uint32 charCount = 0;
 
-    while (tokenizer->at[headingCounter] &&
+    while (tokenizer->at[headingCounter] != '\0' &&
         tokenizer->at[headingCounter] == '#')
     {
         headingCounter++;
@@ -286,47 +285,32 @@ static md_token md_get_token(md_tokenizer* tokenizer)
     switch(tokenizer->at[0])
     {
         case '\0':
-        {
             token.type = MD_TOKEN_EOF;
-            break;
-        }
+        break;
+
         case '#':
-        {
             md_parse_atx_headers(tokenizer, &token);
-            break;
-        }
+        break;
+
         case '*':
-        {
-            md_parse_thematic_break(tokenizer, &token, '*');
-            break;
-        }
+            md_parse_thematic_break(tokenizer, &token, tokenizer->at[0]);
+        break;
         case '-':
-        {
-            md_parse_thematic_break(tokenizer, &token, '-');
-            break;
-        }
+            md_parse_thematic_break(tokenizer, &token, tokenizer->at[0]);
+        break;
         case '_':
-        {
-            md_parse_thematic_break(tokenizer, &token, '_');
-            break;
-        }
+            md_parse_thematic_break(tokenizer, &token, tokenizer->at[0]);
+        break;
 
         case '\n':
-        {
-            while(tokenizer->at[0] == '\n')
-            {
+            while (tokenizer->at[0] == '\n')
                 tokenizer->at++;
-            }
-
             token = md_get_token(tokenizer);
-            break;
-        }
+        break;
 
         default:
-        {
             md_parse_paragraph(tokenizer, &token);
-            break;
-        }
+        break;
     }
 
     return token;
@@ -348,11 +332,6 @@ extern char* md_compile_ast(char* markdown)
 
         switch(token.type)
         {
-            case MD_TOKEN_EOF:
-                printf("End of file");
-                parsing = false;
-            break;
-
             case MD_TOKEN_HEADING1:
                 printf("<h1>%.*s</h1>"NL, token.length, token.text); 
             break;
@@ -378,6 +357,10 @@ extern char* md_compile_ast(char* markdown)
 
             case MD_TOKEN_PARAGRAPH:
                 printf("<p>%.*s</p>"NL, token.length, token.text);
+            break;
+
+            case MD_TOKEN_EOF:
+                parsing = false;
             break;
         }
     }
